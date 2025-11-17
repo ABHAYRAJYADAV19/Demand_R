@@ -20,7 +20,12 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     # Fetch reviews from MongoDB
-    reviews = list(db.feedback.find().sort('created_at', -1).limit(3))
+    reviews = []
+    if db is not None:
+        try:
+            reviews = list(db.feedback.find().sort('created_at', -1).limit(3))
+        except Exception as e:
+            print(f"Error fetching reviews: {e}")
     return render_template('index.html', reviews=reviews)
 
 @app.route('/report-need', methods=['GET'])
@@ -49,9 +54,11 @@ def submit_report():
                 data['image_path'] = f'uploads/{filename}'
 
         # Store in MongoDB
-        db.user_needs.insert_one(data)
-        
-        return jsonify({'success': True, 'message': 'Report submitted successfully'})
+        if db is not None:
+            db.user_needs.insert_one(data)
+            return jsonify({'success': True, 'message': 'Report submitted successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Database not available'}), 503
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
@@ -61,44 +68,57 @@ def business_dashboard():
 
 @app.route('/insights')
 def insights():
-    # Get total submissions
-    total_submissions = db.user_needs.count_documents({})
+    if db is None:
+        return render_template('insights.html', 
+                             total_submissions=0,
+                             recent_submissions=0,
+                             most_requested={'service': 'Database not available', 'count': 0, 'description': ''})
     
-    # Get submissions in last 24 hours
-    yesterday = datetime.utcnow() - timedelta(days=1)
-    recent_submissions = db.user_needs.count_documents({'submitted_at': {'$gte': yesterday}})
-    
-    # Get most requested service
-    top_service = db.user_needs.aggregate([
-        {'$group': {
-            '_id': {
-                'service': '$service_type',
-                'description': '$description'
-            },
-            'count': {'$sum': 1}
-        }},
-        {'$sort': {'count': -1}},
-        {'$limit': 1}
-    ])
-    
-    top_service = list(top_service)
-    most_requested = {
-        'service': 'No requests yet',
-        'count': 0,
-        'description': ''
-    }
-    
-    if top_service:
+    try:
+        # Get total submissions
+        total_submissions = db.user_needs.count_documents({})
+        
+        # Get submissions in last 24 hours
+        yesterday = datetime.utcnow() - timedelta(days=1)
+        recent_submissions = db.user_needs.count_documents({'submitted_at': {'$gte': yesterday}})
+        
+        # Get most requested service
+        top_service = db.user_needs.aggregate([
+            {'$group': {
+                '_id': {
+                    'service': '$service_type',
+                    'description': '$description'
+                },
+                'count': {'$sum': 1}
+            }},
+            {'$sort': {'count': -1}},
+            {'$limit': 1}
+        ])
+        
+        top_service = list(top_service)
         most_requested = {
-            'service': top_service[0]['_id']['service'],
-            'count': top_service[0]['count'],
-            'description': top_service[0]['_id']['description'][:50] + '...' if top_service[0]['_id']['description'] else ''
+            'service': 'No requests yet',
+            'count': 0,
+            'description': ''
         }
-    
-    return render_template('insights.html', 
-                         total_submissions=total_submissions,
-                         recent_submissions=recent_submissions,
-                         most_requested=most_requested)
+        
+        if top_service:
+            most_requested = {
+                'service': top_service[0]['_id']['service'],
+                'count': top_service[0]['count'],
+                'description': top_service[0]['_id']['description'][:50] + '...' if top_service[0]['_id']['description'] else ''
+            }
+        
+        return render_template('insights.html', 
+                             total_submissions=total_submissions,
+                             recent_submissions=recent_submissions,
+                             most_requested=most_requested)
+    except Exception as e:
+        print(f"Error in insights: {e}")
+        return render_template('insights.html', 
+                             total_submissions=0,
+                             recent_submissions=0,
+                             most_requested={'service': 'Error loading data', 'count': 0, 'description': ''})
 
 # Add email configuration
 SMTP_SERVER = "smtp.gmail.com"
@@ -149,10 +169,11 @@ def subscribe_newsletter():
         email = data.get('email')
         
         # Store subscriber in database
-        db.subscribers.insert_one({
-            'email': email,
-            'subscribed_at': datetime.utcnow()
-        })
+        if db is not None:
+            db.subscribers.insert_one({
+                'email': email,
+                'subscribed_at': datetime.utcnow()
+            })
         
         subject = "You've subscribed to Neighborhood Updates!"
         body = "Thanks for subscribing. You'll now get the latest updates on community needs and services."
@@ -178,8 +199,11 @@ def submit_feedback():
         }
         
         # Using db instead of mongo
-        db.feedback.insert_one(feedback)
-        return jsonify({'success': True, 'message': 'Feedback submitted successfully'}), 200
+        if db is not None:
+            db.feedback.insert_one(feedback)
+            return jsonify({'success': True, 'message': 'Feedback submitted successfully'}), 200
+        else:
+            return jsonify({'success': False, 'message': 'Database not available'}), 503
     except Exception as e:
         print('Error:', str(e))  # For debugging
         return jsonify({'success': False, 'message': str(e)}), 500

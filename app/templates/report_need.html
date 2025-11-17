@@ -1,111 +1,228 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Report a Need{% endblock %} {% block
+content %}
+<div
+  class="report-need-page"
+  style="
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  "
+>
+  <div class="form-container animate-on-scroll">
+    <h1>Report a Missing Service</h1>
+    <p>Help us understand what services are needed in your area</p>
 
-{% block title %}Report a Need{% endblock %}
+    <form id="reportForm" class="need-form" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          style="transition: all 0.3s ease"
+          onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 0 3px rgba(0, 135, 90, 0.1)';"
+          onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';"
+        />
+      </div>
 
-{% block content %}
-<div class="report-need-page">
-    <div class="form-container">
-        <h1>Report a Missing Service</h1>
-        <p>Help us understand what services are needed in your area</p>
-        
-        <form id="reportForm" class="need-form" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="location">Location</label>
-                <div class="location-input">
-                    <input type="text" id="location" name="location" required>
-                    <a href="#" id="useLocation" class="location-link">
-                        <i class="fas fa-map-marker-alt"></i> Use my location
-                    </a>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="service_type">Type of Service</label>
-                <select id="service_type" name="service_type" required>
-                    <option value="">Select a service type</option>
-                    <option value="Fitness Center">Fitness Center</option>
-                    <option value="Bakery">Bakery</option>
-                    <option value="Coffee Shop">Coffee Shop</option>
-                    <option value="Child Care">Child Care</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="description">Description (Optional)</label>
-                <textarea id="description" name="description" rows="4"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="image">Upload Image (Optional)</label>
-                <div class="file-upload-area" id="dropZone">
-                    <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif">
-                    <div class="upload-text">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Drag and drop or click to upload</p>
-                        <span>Max size: 10MB (JPG, PNG, GIF)</span>
-                    </div>
-                </div>
-            </div>
-            
-            <button type="submit" class="submit-btn">Submit Report</button>
-            <a href="{{ url_for('insights') }}" class="previous-submissions">Already submitted? Click here</a>
-        </form>
-    </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          style="transition: all 0.3s ease"
+          onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 0 3px rgba(0, 135, 90, 0.1)';"
+          onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="location">Location</label>
+        <div class="location-input">
+          <input type="text" id="location" name="location" required />
+          <a href="#" id="useLocation" class="location-link">
+            <i class="fas fa-map-marker-alt"></i> Use my location
+          </a>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="service_type">Type of Service</label>
+        <select
+          id="service_type"
+          name="service_type"
+          required
+          style="transition: all 0.3s ease"
+          onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 0 3px rgba(0, 135, 90, 0.1)';"
+          onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';"
+        >
+          <option value="">Select a service type</option>
+          <option value="Fitness Center">🏋️ Fitness Center</option>
+          <option value="Bakery">🥖 Bakery</option>
+          <option value="Coffee Shop">☕ Coffee Shop</option>
+          <option value="Child Care">👶 Child Care</option>
+          <option value="Other">📝 Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description (Optional)</label>
+        <textarea id="description" name="description" rows="4"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="image">Upload Image (Optional)</label>
+        <div
+          class="file-upload-area"
+          id="dropZone"
+          style="transition: all 0.3s ease; cursor: pointer"
+          ondragover="event.preventDefault(); this.style.borderColor='var(--primary-color)'; this.style.backgroundColor='rgba(0, 135, 90, 0.05)';"
+          ondragleave="this.style.borderColor='#ddd'; this.style.backgroundColor='transparent';"
+          ondrop="handleDrop(event)"
+        >
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept=".jpg,.jpeg,.png,.gif"
+            style="display: none"
+            onchange="handleFileSelect(event)"
+          />
+          <div
+            class="upload-text"
+            onclick="document.getElementById('image').click();"
+          >
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p id="uploadText">Drag and drop or click to upload</p>
+            <span>Max size: 10MB (JPG, PNG, GIF)</span>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span id="btnText">Submit Report</span>
+        <i
+          class="fas fa-spinner fa-spin"
+          id="btnSpinner"
+          style="display: none; margin-left: 8px"
+        ></i>
+      </button>
+      <a href="{{ url_for('insights') }}" class="previous-submissions"
+        >Already submitted? Click here</a
+      >
+    </form>
+  </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('reportForm');
-    const locationBtn = document.getElementById('useLocation');
-    
+  function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+      document.getElementById(
+        "uploadText"
+      ).textContent = `Selected: ${file.name}`;
+      document.getElementById("dropZone").style.borderColor =
+        "var(--primary-color)";
+    }
+  }
+
+  function handleDrop(event) {
+    event.preventDefault();
+    const dropZone = document.getElementById("dropZone");
+    dropZone.style.borderColor = "#ddd";
+    dropZone.style.backgroundColor = "transparent";
+
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      document.getElementById("image").files = event.dataTransfer.files;
+      document.getElementById(
+        "uploadText"
+      ).textContent = `Selected: ${file.name}`;
+      dropZone.style.borderColor = "var(--primary-color)";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("reportForm");
+    const locationBtn = document.getElementById("useLocation");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = document.getElementById("btnText");
+    const btnSpinner = document.getElementById("btnSpinner");
+
+    // Scroll animation
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.animation = "fadeIn 0.8s ease forwards";
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    document.querySelectorAll(".animate-on-scroll").forEach((el) => {
+      observer.observe(el);
+    });
+
     // Handle location button
-    locationBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                // Here you would typically use a geocoding service
-                // For now, just show coordinates
-                document.getElementById('location').value = 
-                    `${position.coords.latitude}, ${position.coords.longitude}`;
-            });
-        }
+    locationBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          // Here you would typically use a geocoding service
+          // For now, just show coordinates
+          document.getElementById(
+            "location"
+          ).value = `${position.coords.latitude}, ${position.coords.longitude}`;
+        });
+      }
     });
-    
+
     // Handle form submission
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(form);
-        
-        try {
-            const response = await fetch('/submit-report', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                alert('Report submitted successfully!');
-                window.location.href = '/insights';
-            } else {
-                alert('Error submitting report: ' + data.message);
-            }
-        } catch (error) {
-            alert('Error submitting report');
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      // Show loading state
+      submitBtn.disabled = true;
+      btnText.textContent = "Submitting...";
+      btnSpinner.style.display = "inline-block";
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch("/submit-report", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Success animation
+          submitBtn.innerHTML = '<i class="fas fa-check"></i> Success!';
+          submitBtn.style.backgroundColor = "#28a745";
+
+          setTimeout(() => {
+            window.location.href = "/insights";
+          }, 1500);
+        } else {
+          alert("Error submitting report: " + data.message);
+          // Reset button
+          submitBtn.disabled = false;
+          btnText.textContent = "Submit Report";
+          btnSpinner.style.display = "none";
         }
+      } catch (error) {
+        alert("Error submitting report");
+        // Reset button
+        submitBtn.disabled = false;
+        btnText.textContent = "Submit Report";
+        btnSpinner.style.display = "none";
+      }
     });
-});
+  });
 </script>
 {% endblock %}

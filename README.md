@@ -17,12 +17,12 @@
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: HTML, CSS, JavaScript  
-- **Backend**: Python (Flask)  
-- **Database**: MongoDB  
-- **Maps**: Leaflet.js + Heatmap.js  
-- **Icons**: Font Awesome  
-- **Others**: dotenv, Flask extensions  
+- **Frontend**: HTML, CSS, JavaScript
+- **Backend**: Python (Flask)
+- **Database**: MongoDB
+- **Maps**: Leaflet.js + Heatmap.js
+- **Icons**: Font Awesome
+- **Others**: dotenv, Flask extensions
 
 ---
 
@@ -122,13 +122,13 @@ DemandRadar/
 
 ## 📡 API Endpoints
 
-| Method | Endpoint                | Description                         |
-|--------|-------------------------|-------------------------------------|
-| POST   | `/submit-report`        | Submit a missing service report     |
-| POST   | `/submit-review`        | Submit a user review                |
-| GET    | `/get-reviews`          | Fetch recent user reviews           |
-| POST   | `/send-referral`        | Send referral invitation via email  |
-| POST   | `/subscribe-newsletter` | Subscribe to newsletter             |
+| Method | Endpoint                | Description                        |
+| ------ | ----------------------- | ---------------------------------- |
+| POST   | `/submit-report`        | Submit a missing service report    |
+| POST   | `/submit-review`        | Submit a user review               |
+| GET    | `/get-reviews`          | Fetch recent user reviews          |
+| POST   | `/send-referral`        | Send referral invitation via email |
+| POST   | `/subscribe-newsletter` | Subscribe to newsletter            |
 
 ---
 
@@ -172,12 +172,10 @@ Add any others as needed (e.g., EMAIL_API_KEY if email features are used).
 
 ---
 
-
-
 ## 🙌 Contact
 
-**Jaineesh**  
-📧 jaineeshpatel73@gmail.com  
+**Abhay**  
+📧 19abhay26@gmail.com
 🔗 [GitHub Repo](https://github.com/jaineeshx/DemandRadar)
 
 ---
