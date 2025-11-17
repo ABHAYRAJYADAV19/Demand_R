@@ -176,7 +176,7 @@ Add any others as needed (e.g., EMAIL_API_KEY if email features are used).
 
 **Abhay**  
 📧 19abhay26@gmail.com
-🔗 [GitHub Repo](https://github.com/jaineeshx/DemandRadar)
+🔗 [GitHub Repo](https://github.com/ABHAYRAJYADAV19/Demand_Radar.git)
 
 ---
 
