@@ -136,3 +136,6 @@ Thumbs.db
 # Project specific
 uploads/
 *.db
+
+server.log
+server.err

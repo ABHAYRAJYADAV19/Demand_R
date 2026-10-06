@@ -1,160 +1,146 @@
 {% extends "base.html" %}
-
-{% block title %}Business Insights - DemandRadar{% endblock %}
-
+{% block title %}For Businesses{% endblock %}
 {% block content %}
-<section class="discover-section">
-    <div class="discover-container">
-        <div class="discover-header">
-            <h2>Discover Where Your Services Are Needed Most</h2>
-            <p>Gain exclusive access to real-time, location-based demand insights to strategically expand your business.</p>
-        </div>
-        
-        <div class="discover-cards">
-            <div class="discover-card">
-                <div class="discover-card-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>Identify Underserved Markets</h3>
-                <p>Discover areas with high demand but low service availability.</p>
-            </div>
-            
-            <div class="discover-card">
-                <div class="discover-card-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>Tailor Services to Actual Needs</h3>
-                <p>Base your business decisions on real community feedback.</p>
-            </div>
-            
-            <div class="discover-card">
-                <div class="discover-card-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h3>Enhance Customer Satisfaction</h3>
-                <p>Meet actual needs to build loyalty and positive reputation.</p>
-            </div>
-        </div>
-    </div>
+<section class="page-head">
+  <div class="container">
+    <h1>Discover Where Your Services Are Needed Most</h1>
+    <p>Gain access to location-based demand insights to strategically expand your business.</p>
+  </div>
 </section>
 
-<section class="how-it-works">
-    <div class="how-it-works-container">
-        <h2>How DemandRadar Works</h2>
-        <div class="steps-container">
-            <div class="step-item">
-                <div class="step-icon">
-                    <i class="fas fa-file-alt"></i>
-                </div>
-                <div class="step-text">Community members submit service requests</div>
-            </div>
-            
-            <div class="step-item">
-                <div class="step-icon">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <div class="step-text">Data is aggregated and anonymized</div>
-            </div>
-            
-            <div class="step-item">
-                <div class="step-icon">
-                    <i class="fas fa-user-friends"></i>
-                </div>
-                <div class="step-text">Businesses access insights</div>
-            </div>
-            
-            <div class="step-item">
-                <div class="step-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="step-text">Services aligned with needs</div>
-            </div>
-        </div>
+<section class="section">
+  <div class="container">
+    {% if business %}
+    <div class="welcome-banner">
+      <span><i class="fas fa-circle-check"></i> Signed in as <strong>{{ business }}</strong></span>
+      <span><a class="btn-primary" href="{{ url_for('business_requests') }}">Open requests dashboard</a>
+      <a class="btn-ghost" href="{{ url_for('business_logout') }}">Sign out</a></span>
     </div>
+    {% endif %}
+    <div class="cards-3 reveal">
+      <div class="discover-card"><div class="icon-badge"><i class="fas fa-chart-line"></i></div><h3>Identify Underserved Markets</h3><p>Discover areas with high demand but low service availability.</p></div>
+      <div class="discover-card"><div class="icon-badge"><i class="fas fa-users"></i></div><h3>Tailor Services to Actual Needs</h3><p>Base your business decisions on real community feedback.</p></div>
+      <div class="discover-card"><div class="icon-badge"><i class="fas fa-circle-check"></i></div><h3>Enhance Customer Satisfaction</h3><p>Meet actual needs to build loyalty and a positive reputation.</p></div>
+    </div>
+  </div>
 </section>
 
-<!-- Add this section after the How It Works section -->
-<section class="business-forms">
-    <div class="business-forms-container">
-        <!-- Business Subscription Form -->
-        <div class="form-card">
-            <h2>Business Subscription</h2>
-            <p class="subtitle">Get access to local demand insights</p>
-            
-            <form class="subscription-form">
-                <div class="form-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" placeholder="John Smith" required>
-                </div>
-                
-                <div class="form-group">
-                    <i class="fas fa-briefcase"></i>
-                    <input type="text" placeholder="Your Company LLC" required>
-                </div>
-                
-                <div class="form-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" placeholder="you@example.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <i class="fas fa-phone"></i>
-                    <input type="tel" placeholder="+1 (555) 000-0000" required>
-                </div>
-                
-                <div class="form-group">
-                    <i class="fas fa-tag"></i>
-                    <select required>
-                        <option value="">Select a category</option>
-                        <option value="retail">Retail</option>
-                        <option value="restaurant">Restaurant</option>
-                        <option value="healthcare">Healthcare</option>
-                        <option value="education">Education</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                
-                <!-- Remove the location select field -->
-                
-                <button type="submit" class="btn-subscribe">Subscribe & View Requests</button>
-                
-                <p class="form-note">You will get access to a personalized dashboard upon verification.</p>
-                
-                <div class="trust-badge">
-                    <i class="fas fa-check-circle"></i>
-                    Trusted by 100+ local businesses
-                </div>
-            </form>
-        </div>
-        
-        <!-- Contact Form -->
-        <div class="form-card">
-            <h2>Need Help or Have Questions?</h2>
-            <p class="subtitle">Get in touch with our support team</p>
-            
-            <form class="contact-form">
-                <div class="form-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" placeholder="Your name" required>
-                </div>
-                
-                <div class="form-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" placeholder="your@email.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <textarea placeholder="How can we help you?" required></textarea>
-                </div>
-                
-                <button type="submit" class="btn-contact">
-                    <i class="fas fa-paper-plane"></i>
-                    Send Message
-                </button>
-                
-                <p class="form-note">Our team is here to guide you on how to leverage location-based demand for your growth.</p>
-            </form>
-        </div>
+<section class="section section-alt">
+  <div class="container reveal">
+    <h2 class="section-title">How DemandRadar Works</h2>
+    <p class="section-sub">From community voices to business action.</p>
+    <div class="cards-4">
+      <div class="step-item"><div class="step-icon"><i class="fas fa-file-lines"></i></div><p>Community members submit service requests</p></div>
+      <div class="step-item"><div class="step-icon"><i class="fas fa-chart-column"></i></div><p>Data is aggregated and anonymised</p></div>
+      <div class="step-item"><div class="step-icon"><i class="fas fa-user-group"></i></div><p>Businesses access insights</p></div>
+      <div class="step-item"><div class="step-icon"><i class="fas fa-check"></i></div><p>Services aligned with needs</p></div>
     </div>
+  </div>
 </section>
+
+<section class="section" id="subscribe">
+  <div class="container">
+    <div class="business-forms">
+      <div class="form-card">
+        <h2>Business Subscription</h2>
+        <p class="subtitle">Get access to local demand insights</p>
+        <form id="subscribeForm" novalidate>
+          <div class="form-group"><label for="b_name">Full name</label><input type="text" id="b_name" name="name" maxlength="100" placeholder="John Smith" autocomplete="name"></div>
+          <div class="form-group"><label for="b_company">Company</label><input type="text" id="b_company" name="company" maxlength="150" placeholder="Your Company LLC" autocomplete="organization"></div>
+          <div class="form-row">
+            <div class="form-group"><label for="b_email">Email</label><input type="email" id="b_email" name="email" maxlength="150" placeholder="you@example.com" autocomplete="email"></div>
+            <div class="form-group"><label for="b_phone">Phone</label><input type="tel" id="b_phone" name="phone" maxlength="30" placeholder="+91 98765 43210" autocomplete="tel"></div>
+          </div>
+          <div class="form-group">
+            <label for="b_category">Business category</label>
+            <select id="b_category" name="category">
+              <option value="">Select a category</option>
+              {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn-primary btn-block"><i class="fas fa-spinner fa-spin spinner"></i><span class="btn-label">Subscribe &amp; view requests</span></button>
+          <p class="form-note">You get instant access to the requests dashboard.</p>
+          <div class="trust-badge"><i class="fas fa-circle-check"></i> Trusted by local businesses</div>
+        </form>
+        <details class="signin-box">
+          <summary>Already subscribed? Sign in</summary>
+          <form id="loginForm" novalidate>
+            <div class="input-group">
+              <input type="email" id="l_email" aria-label="Subscribed email" placeholder="Your subscribed email">
+              <button type="submit" class="btn-secondary"><i class="fas fa-spinner fa-spin spinner"></i><span class="btn-label">Sign in</span></button>
+            </div>
+          </form>
+        </details>
+      </div>
+
+      <div class="form-card">
+        <h2>Need Help or Have Questions?</h2>
+        <p class="subtitle">Get in touch with our support team</p>
+        <form id="contactForm" novalidate>
+          <div class="form-group"><label for="c_name">Name</label><input type="text" id="c_name" name="name" maxlength="100" placeholder="Your name"></div>
+          <div class="form-group"><label for="c_email">Email</label><input type="email" id="c_email" name="email" maxlength="150" placeholder="your@email.com"></div>
+          <div class="form-group"><label for="c_message">Message</label><textarea id="c_message" name="message" maxlength="2000" placeholder="How can we help you?"></textarea></div>
+          <button type="submit" class="btn-primary btn-block"><i class="fas fa-spinner fa-spin spinner"></i><i class="fas fa-paper-plane"></i><span class="btn-label">Send message</span></button>
+          <p class="form-note">Our team will guide you on leveraging location-based demand for growth.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const { $, toast, postJSON, setLoading, clearErrors, showErrors } = DR;
+  const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+  function handle(form, url, validate, onOk) {
+    form.addEventListener('submit', async e => {
+      e.preventDefault(); e.stopPropagation();
+      clearErrors(form);
+      const body = Object.fromEntries(new FormData(form).entries());
+      Object.keys(body).forEach(k => { if (typeof body[k] === 'string') body[k] = body[k].trim(); });
+      const errs = validate(body);
+      if (Object.keys(errs).length) return showErrors(form, errs);
+      const btn = $('button[type=submit]', form);
+      setLoading(btn, true);
+      const { ok, data } = await postJSON(url, body);
+      setLoading(btn, false);
+      if (ok) { toast(data.message); onOk(data); }
+      else { if (data.errors) showErrors(form, data.errors); toast(data.message || 'Something went wrong.', 'error'); }
+    });
+  }
+
+  handle($('#subscribeForm'), '/business/subscribe', b => {
+    const e = {};
+    if (b.name.length < 2) e.name = 'Enter your name.';
+    if (b.company.length < 2) e.company = 'Enter your company name.';
+    if (!EMAIL.test(b.email)) e.email = 'Enter a valid email.';
+    if (b.phone.replace(/\D/g, '').length < 7) e.phone = 'Enter a valid phone number.';
+    if (!b.category) e.category = 'Select a category.';
+    return e;
+  }, d => setTimeout(() => { location.href = d.redirect; }, 700));
+
+  const login = $('#loginForm');
+  login.addEventListener('submit', async e => {
+    e.preventDefault(); e.stopPropagation();
+    const input = $('#l_email'); input.classList.remove('is-invalid');
+    if (!EMAIL.test(input.value.trim())) { input.classList.add('is-invalid'); return toast('Enter a valid email.', 'error'); }
+    const btn = $('button[type=submit]', login); setLoading(btn, true);
+    const { ok, data } = await postJSON('/business/login', { email: input.value.trim() });
+    setLoading(btn, false);
+    if (ok) location.href = data.redirect; else toast(data.message, 'error');
+  });
+
+  const contact = $('#contactForm');
+  handle(contact, '/contact', b => {
+    const e = {};
+    if (b.name.length < 2) e.name = 'Enter your name.';
+    if (!EMAIL.test(b.email)) e.email = 'Enter a valid email.';
+    if (b.message.length < 5) e.message = 'Please write a short message.';
+    return e;
+  }, () => contact.reset());
+})();
+</script>
 {% endblock %}

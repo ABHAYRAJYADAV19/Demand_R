@@ -1,228 +1,157 @@
-{% extends "base.html" %} {% block title %}Report a Need{% endblock %} {% block
-content %}
-<div
-  class="report-need-page"
-  style="
-    padding: 4rem 0;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  "
->
-  <div class="form-container animate-on-scroll">
+{% extends "base.html" %}
+{% block title %}Report a Need{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div class="container">
     <h1>Report a Missing Service</h1>
-    <p>Help us understand what services are needed in your area</p>
+    <p>Help us understand what services are needed in your area.</p>
+  </div>
+</section>
 
-    <form id="reportForm" class="need-form" enctype="multipart/form-data">
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          required
-          style="transition: all 0.3s ease"
-          onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 0 3px rgba(0, 135, 90, 0.1)';"
-          onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          required
-          style="transition: all 0.3s ease"
-          onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 0 3px rgba(0, 135, 90, 0.1)';"
-          onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';"
-        />
+<div class="form-wrap">
+  <div class="form-card">
+    <div class="alert alert-error" id="formAlert" role="alert"></div>
+    <form id="reportForm" novalidate enctype="multipart/form-data">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required maxlength="100" autocomplete="name" placeholder="Jane Doe">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required maxlength="150" autocomplete="email" placeholder="you@example.com">
+        </div>
       </div>
 
       <div class="form-group">
         <label for="location">Location</label>
         <div class="location-input">
-          <input type="text" id="location" name="location" required />
-          <a href="#" id="useLocation" class="location-link">
-            <i class="fas fa-map-marker-alt"></i> Use my location
-          </a>
+          <input type="text" id="location" name="location" required maxlength="200" placeholder="Neighbourhood, city">
+          <button type="button" id="useLocation" class="btn-ghost"><i class="fas fa-location-crosshairs"></i> Use my location</button>
         </div>
+        <p class="hint" id="geoHint">We use this to place your request on the demand map.</p>
+        <input type="hidden" name="lat" id="lat"><input type="hidden" name="lng" id="lng">
       </div>
 
       <div class="form-group">
-        <label for="service_type">Type of Service</label>
-        <select
-          id="service_type"
-          name="service_type"
-          required
-          style="transition: all 0.3s ease"
-          onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 0 3px rgba(0, 135, 90, 0.1)';"
-          onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';"
-        >
+        <label for="service_type">Type of service</label>
+        <select id="service_type" name="service_type" required>
           <option value="">Select a service type</option>
-          <option value="Fitness Center">🏋️ Fitness Center</option>
-          <option value="Bakery">🥖 Bakery</option>
-          <option value="Coffee Shop">☕ Coffee Shop</option>
-          <option value="Child Care">👶 Child Care</option>
-          <option value="Other">📝 Other</option>
+          {% for s in service_types %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
         </select>
       </div>
 
       <div class="form-group">
-        <label for="description">Description (Optional)</label>
-        <textarea id="description" name="description" rows="4"></textarea>
+        <label for="description">Description <span class="opt">(optional)</span></label>
+        <textarea id="description" name="description" maxlength="1000" placeholder="Tell us what is missing and why it would help"></textarea>
       </div>
 
       <div class="form-group">
-        <label for="image">Upload Image (Optional)</label>
-        <div
-          class="file-upload-area"
-          id="dropZone"
-          style="transition: all 0.3s ease; cursor: pointer"
-          ondragover="event.preventDefault(); this.style.borderColor='var(--primary-color)'; this.style.backgroundColor='rgba(0, 135, 90, 0.05)';"
-          ondragleave="this.style.borderColor='#ddd'; this.style.backgroundColor='transparent';"
-          ondrop="handleDrop(event)"
-        >
-          <input
-            type="file"
-            id="image"
-            name="image"
-            accept=".jpg,.jpeg,.png,.gif"
-            style="display: none"
-            onchange="handleFileSelect(event)"
-          />
-          <div
-            class="upload-text"
-            onclick="document.getElementById('image').click();"
-          >
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p id="uploadText">Drag and drop or click to upload</p>
-            <span>Max size: 10MB (JPG, PNG, GIF)</span>
-          </div>
+        <label>Upload image <span class="opt">(optional)</span></label>
+        <div class="file-upload-area" id="dropZone" tabindex="0" role="button" aria-label="Upload an image">
+          <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif" class="visually-hidden" tabindex="-1">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p id="uploadText">Drag and drop, or click to upload</p>
+          <span class="hint">Max 10MB (JPG, PNG, GIF)</span>
+          <img id="preview" class="preview-thumb" alt="" hidden>
         </div>
       </div>
 
-      <button type="submit" class="submit-btn" id="submitBtn">
-        <span id="btnText">Submit Report</span>
-        <i
-          class="fas fa-spinner fa-spin"
-          id="btnSpinner"
-          style="display: none; margin-left: 8px"
-        ></i>
+      <button type="submit" class="btn-primary btn-block" id="submitBtn">
+        <i class="fas fa-spinner fa-spin spinner"></i><span class="btn-label">Submit Report</span>
       </button>
-      <a href="{{ url_for('insights') }}" class="previous-submissions"
-        >Already submitted? Click here</a
-      >
+      <p class="form-footer"><a href="{{ url_for('insights') }}">Already submitted? View community insights</a></p>
     </form>
   </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-  function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-      document.getElementById(
-        "uploadText"
-      ).textContent = `Selected: ${file.name}`;
-      document.getElementById("dropZone").style.borderColor =
-        "var(--primary-color)";
-    }
+(function () {
+  const { $, toast, request, setLoading, clearErrors, showErrors } = DR;
+  const form = $('#reportForm'), alertBox = $('#formAlert'), zone = $('#dropZone'), file = $('#image');
+  const MAX = 10 * 1024 * 1024, OK_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+
+  function pickFile(f) {
+    if (!f) return;
+    if (!OK_TYPES.includes(f.type)) { toast('Image must be JPG, PNG or GIF.', 'error'); file.value = ''; return; }
+    if (f.size > MAX) { toast('Image is larger than 10MB.', 'error'); file.value = ''; return; }
+    $('#uploadText').innerHTML = '<span class="file-name"></span>';
+    $('#uploadText .file-name').textContent = f.name;
+    const img = $('#preview'); img.src = URL.createObjectURL(f); img.hidden = false;
   }
-
-  function handleDrop(event) {
-    event.preventDefault();
-    const dropZone = document.getElementById("dropZone");
-    dropZone.style.borderColor = "#ddd";
-    dropZone.style.backgroundColor = "transparent";
-
-    const file = event.dataTransfer.files[0];
-    if (file) {
-      document.getElementById("image").files = event.dataTransfer.files;
-      document.getElementById(
-        "uploadText"
-      ).textContent = `Selected: ${file.name}`;
-      dropZone.style.borderColor = "var(--primary-color)";
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("reportForm");
-    const locationBtn = document.getElementById("useLocation");
-    const submitBtn = document.getElementById("submitBtn");
-    const btnText = document.getElementById("btnText");
-    const btnSpinner = document.getElementById("btnSpinner");
-
-    // Scroll animation
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.style.animation = "fadeIn 0.8s ease forwards";
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    document.querySelectorAll(".animate-on-scroll").forEach((el) => {
-      observer.observe(el);
-    });
-
-    // Handle location button
-    locationBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-          // Here you would typically use a geocoding service
-          // For now, just show coordinates
-          document.getElementById(
-            "location"
-          ).value = `${position.coords.latitude}, ${position.coords.longitude}`;
-        });
-      }
-    });
-
-    // Handle form submission
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      // Show loading state
-      submitBtn.disabled = true;
-      btnText.textContent = "Submitting...";
-      btnSpinner.style.display = "inline-block";
-
-      const formData = new FormData(form);
-
-      try {
-        const response = await fetch("/submit-report", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          // Success animation
-          submitBtn.innerHTML = '<i class="fas fa-check"></i> Success!';
-          submitBtn.style.backgroundColor = "#28a745";
-
-          setTimeout(() => {
-            window.location.href = "/insights";
-          }, 1500);
-        } else {
-          alert("Error submitting report: " + data.message);
-          // Reset button
-          submitBtn.disabled = false;
-          btnText.textContent = "Submit Report";
-          btnSpinner.style.display = "none";
-        }
-      } catch (error) {
-        alert("Error submitting report");
-        // Reset button
-        submitBtn.disabled = false;
-        btnText.textContent = "Submit Report";
-        btnSpinner.style.display = "none";
-      }
-    });
+  zone.addEventListener('click', () => file.click());
+  zone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); file.click(); } });
+  file.addEventListener('change', () => pickFile(file.files[0]));
+  ['dragover', 'dragenter'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('drag'); }));
+  zone.addEventListener('drop', e => {
+    if (e.dataTransfer.files.length) { file.files = e.dataTransfer.files; pickFile(file.files[0]); }
   });
+
+  // Coordinates are cleared whenever the user edits the location text manually.
+  $('#location').addEventListener('input', () => { $('#lat').value = ''; $('#lng').value = ''; });
+
+  $('#useLocation').addEventListener('click', e => {
+    const btn = e.currentTarget;
+    if (!navigator.geolocation) return toast('Geolocation is not supported by your browser.', 'error');
+    btn.disabled = true;
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      $('#lat').value = lat; $('#lng').value = lng;
+      $('#location').value = lat.toFixed(4) + ', ' + lng.toFixed(4);
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=14&lat=${lat}&lon=${lng}`);
+        const j = await r.json();
+        if (j.display_name) $('#location').value = j.display_name.split(',').slice(0, 3).join(',').trim();
+      } catch (_) { /* keep coordinates */ }
+      $('#geoHint').textContent = 'Location detected.';
+      btn.disabled = false;
+    }, () => { toast('Could not get your location. Please type it instead.', 'error'); btn.disabled = false; },
+    { timeout: 10000 });
+  });
+
+  // Best-effort forward geocoding of typed locations so they appear on the map.
+  async function geocode(q) {
+    try {
+      const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q),
+        { signal: AbortSignal.timeout(4000) });
+      const j = await r.json();
+      if (j[0]) return { lat: j[0].lat, lng: j[0].lon };
+    } catch (_) { /* offline */ }
+    return null;
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    clearErrors(form); alertBox.classList.remove('show');
+    const errs = {};
+    if (form.name.value.trim().length < 2) errs.name = 'Please enter your name.';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.value.trim())) errs.email = 'Please enter a valid email address.';
+    if (form.location.value.trim().length < 2) errs.location = 'Please enter a location.';
+    if (!form.service_type.value) errs.service_type = 'Please choose a service type.';
+    if (Object.keys(errs).length) return showErrors(form, errs);
+
+    const btn = $('#submitBtn');
+    setLoading(btn, true, 'Submitting...');
+    if (!$('#lat').value) {
+      const g = await geocode(form.location.value.trim());
+      if (g) { $('#lat').value = g.lat; $('#lng').value = g.lng; }
+    }
+    const { ok, data } = await request('/submit-report', { method: 'POST', body: new FormData(form) });
+    if (ok) {
+      btn.querySelector('.btn-label').textContent = 'Submitted!';
+      btn.classList.remove('loading');
+      toast('Report submitted. Thank you!');
+      setTimeout(() => { location.href = '/insights'; }, 1200);
+    } else {
+      setLoading(btn, false, 'Submit Report');
+      if (data.errors) showErrors(form, data.errors);
+      alertBox.textContent = data.message || 'Something went wrong.';
+      alertBox.classList.add('show');
+    }
+  });
+})();
 </script>
 {% endblock %}

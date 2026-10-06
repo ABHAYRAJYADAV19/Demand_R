@@ -1,341 +1,138 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-%}
+﻿{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
 <section class="hero">
   <div class="hero-container">
-    <div class="hero-content">
-      <h1>Missing services in your area?</h1>
-      <h2>Let the world know.</h2>
-      <h2>Let businesses act.</h2>
-      <p>Bridge the gap between citizen needs and business decisions.</p>
-      <a href="{{ url_for('report_need') }}" class="btn-primary"
-        >Report a Need In Your Area</a
-      >
+    <div>
+      <span class="eyebrow"><i class="fas fa-satellite-dish"></i> Community-powered demand data</span>
+      <h1>Missing services in your area? <em>Let businesses act.</em></h1>
+      <p>Bridge the gap between citizen needs and business decisions. Report what your neighbourhood is missing and help entrepreneurs find real demand.</p>
+      <div class="hero-actions">
+        <a href="{{ url_for('report_need') }}" class="btn-primary"><i class="fas fa-bullhorn"></i> Report a Need in Your Area</a>
+        <a href="#insights-dashboard" class="btn-secondary">See live insights</a>
+      </div>
+      <div class="hero-stats" id="heroStats">
+        <div><strong id="statTotal">-</strong><span>Needs reported</span></div>
+        <div><strong id="statRecent">-</strong><span>In the last 24h</span></div>
+        <div><strong id="statCats">-</strong><span>Service categories</span></div>
+      </div>
     </div>
     <div class="hero-image">
-      <img
-        src="{{ url_for('static', filename='images/dashboard/logo.png') }}"
-        alt="Dashboard Map Preview"
-        style="animation: float 3s ease-in-out infinite"
-      />
+      <img src="{{ url_for('static', filename='images/dashboard/logo.png') }}" alt="DemandRadar illustration">
     </div>
   </div>
 </section>
 
-<section class="how-it-works animate-on-scroll">
-  <h2 class="section-title">How It Works</h2>
-  <div class="steps horizontal-layout">
-    <div class="step" style="animation-delay: 0.1s">
-      <div class="step-icon">
-        <img
-          src="{{ url_for('static', filename='images/report.svg') }}"
-          alt="Report"
-        />
+<section class="section section-alt">
+  <div class="container reveal">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-sub">Three simple steps from a local gap to a new business opportunity.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon"><img src="{{ url_for('static', filename='images/report.svg') }}" alt=""></div>
+        <h3>Report a Missing Service</h3>
+        <p>Citizens tell us what they need, such as a gym or an ATM facility.</p>
       </div>
-      <h3>Report a Missing Service</h3>
-      <p>Citizens tell us what they need (e.g. a gym, ATM facility)</p>
-    </div>
-    <div class="step" style="animation-delay: 0.2s">
-      <div class="step-icon">
-        <img
-          src="{{ url_for('static', filename='images/analyze.svg') }}"
-          alt="Analyze"
-        />
+      <div class="step">
+        <div class="step-icon"><img src="{{ url_for('static', filename='images/analyze.svg') }}" alt=""></div>
+        <h3>We Map &amp; Analyze Needs</h3>
+        <p>Geo-tagged reports are aggregated into demand insights.</p>
       </div>
-      <h3>We Map & Analyze Needs</h3>
-      <p>Geo-tagged insights and insights are created</p>
-    </div>
-    <div class="step" style="animation-delay: 0.3s">
-      <div class="step-icon">
-        <img
-          src="{{ url_for('static', filename='images/action.svg') }}"
-          alt="Action"
-        />
+      <div class="step">
+        <div class="step-icon"><img src="{{ url_for('static', filename='images/action.svg') }}" alt=""></div>
+        <h3>Businesses Act on Real Demand</h3>
+        <p>Entrepreneurs use the dashboard to spot opportunities.</p>
       </div>
-      <h3>Businesses Act on Real Demand</h3>
-      <p>Entrepreneurs access the dashboard to spot opportunities</p>
     </div>
   </div>
 </section>
 
-<section class="dashboard-preview animate-on-scroll" id="insights-dashboard">
-  <div class="dashboard-header">
-    <h2>Insights Dashboard Preview</h2>
-    <p>
-      Businesses gain access to real-time data about community needs for
-      strategic expansion decisions.
-    </p>
-  </div>
-
-  <div class="dashboard-container">
-    <div class="dashboard-ui">
-      <div class="dashboard-sidebar">
-        <div class="sidebar-header">
-          <h3>DemandRadar Business Insights</h3>
-        </div>
-
-        <div class="filters-section">
+<section class="section" id="insights-dashboard">
+  <div class="container reveal">
+    <h2 class="section-title">Insights Dashboard Preview</h2>
+    <p class="section-sub">Live, anonymised data on community needs for strategic expansion decisions.</p>
+    <div class="dash">
+      <aside class="dash-side">
+        <h3>DemandRadar Business Insights</h3>
+        <div>
           <h4>Filters</h4>
-          <div class="filter-group">
-            <label class="filter-label">Service Category</label>
-            <select class="filter-select">
-              <option>All Categories</option>
-              <option>Fitness Centers</option>
-              <option>Coffee Shops</option>
-              <option>Bakeries</option>
-              <option>Child Care</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Distance (km)</label>
-            <input
-              type="range"
-              min="0"
-              max="50"
-              value="5"
-              class="distance-slider"
-            />
-            <span>5 km</span>
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Request Frequency</label>
-            <select class="filter-select">
-              <option>High to Low</option>
-              <option>Low to High</option>
-            </select>
-          </div>
-
-          <button class="apply-filters">Apply Filters</button>
+          <label class="field-label" for="catFilter">Service category</label>
+          <select id="catFilter">
+            <option value="all">All categories</option>
+            {% for s in service_types %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+          </select>
         </div>
-
-        <div class="popular-requests">
-          <h4>Popular Requests</h4>
-          <ul class="request-list">
-            <li class="request-item">
-              <span>Fitness Centers</span>
-              <span class="request-count">78</span>
-            </li>
-            <li class="request-item">
-              <span>Coffee Shops</span>
-              <span class="request-count">65</span>
-            </li>
-            <li class="request-item">
-              <span>Bakeries</span>
-              <span class="request-count">54</span>
-            </li>
-            <li class="request-item">
-              <span>Child Care</span>
-              <span class="request-count">42</span>
-            </li>
-          </ul>
+        <div>
+          <h4>Popular requests</h4>
+          <ul class="request-list" id="popularList"><li class="request-item"><span>Loading...</span></li></ul>
         </div>
-      </div>
-
-      <div class="map-section">
-        <div class="map-preview">
-          <img
-            src="{{ url_for('static', filename='images/dashboard/map-bg.jpg') }}"
-            alt="Dashboard Map Preview"
-            class="preview-map"
-          />
-          <div class="map-overlay">
-            <div class="map-marker marker-high" style="top: 30%; left: 40%">
-              18
-            </div>
-            <div class="map-marker marker-medium" style="top: 50%; left: 60%">
-              24
-            </div>
-            <div class="map-marker marker-low" style="top: 40%; left: 50%">
-              12
-            </div>
-          </div>
+      </aside>
+      <div class="dash-main">
+        <div class="map-wrap">
+          <div class="map" id="homeMap"></div>
+          <div class="map-empty"><div><i class="fas fa-map-location-dot"></i><p>No geo-tagged requests for this category yet.</p></div></div>
         </div>
         <div class="map-legend">
-          <div>🔴 High Demand (20+ requests)</div>
-          <div>🟡 Medium Demand (10-20 requests)</div>
-          <div>🔵 Low Demand (< 10 requests)</div>
+          <span><i class="dot high"></i>High demand (20+)</span>
+          <span><i class="dot med"></i>Medium (10-19)</span>
+          <span><i class="dot low"></i>Low (&lt; 10)</span>
         </div>
       </div>
     </div>
+    <div class="cta-row"><a href="{{ url_for('business_dashboard') }}" class="btn-primary">Get Access to Business Dashboard</a></div>
   </div>
-
-  <a href="{{ url_for('business_dashboard') }}" class="access-button"
-    >Get Access to Business Dashboard</a
-  >
 </section>
-<section class="testimonials animate-on-scroll">
-  <div class="testimonials-container">
-    <div class="testimonials-header">
-      <h2>You spoke, we listened</h2>
-      <p>Here's what people are saying about DemandRadar.</p>
-    </div>
-    <div class="testimonials-grid">
+
+<section class="section section-alt">
+  <div class="container reveal">
+    <h2 class="section-title">What People Say</h2>
+    <p class="section-sub">Reviews from members of the DemandRadar community.</p>
+    {% if reviews %}
+    <div class="testimonial-grid">
       {% for review in reviews %}
-      <div class="testimonial-card">
-        <div class="quote-icon">
-          <i class="fas fa-quote-left"></i>
-        </div>
-        <p class="testimonial-text">"{{ review.feedback }}"</p>
+      <article class="testimonial-card">
+        <i class="fas fa-quote-left quote-icon"></i>
+        <p class="testimonial-text">{{ review.feedback }}</p>
         <div class="testimonial-author">
-          <div class="author-avatar"></div>
+          <div class="author-avatar">{{ (review.name or '?')[0]|upper }}</div>
           <div class="author-info">
             <h4>{{ review.name }}</h4>
-            <div class="rating">
-              {% for i in range(review.rating) %}
-              <i class="fas fa-star active"></i>
-              {% endfor %}
+            <div class="rating" aria-label="{{ review.rating }} out of 5">
+              {% for i in range(1, 6) %}<i class="fas fa-star {{ 'on' if i <= (review.rating or 0) }}"></i>{% endfor %}
             </div>
           </div>
         </div>
-      </div>
+      </article>
       {% endfor %}
     </div>
+    {% else %}
+    <div class="empty-state"><i class="far fa-comments"></i>No reviews yet. Be the first to share your experience using the Feedback button.</div>
+    {% endif %}
   </div>
 </section>
+{% endblock %}
 
-<!-- Update the feedback widget section -->
-<div class="feedback-widget">
-  <div class="feedback-header">
-    <span>Share Your Experience</span>
-    <button
-      class="close-btn"
-      onclick="document.querySelector('.feedback-widget').style.display='none'"
-    >
-      &times;
-    </button>
-  </div>
-  <div class="feedback-body">
-    <form id="feedbackForm">
-      <label>How would you rate your experience?</label>
-      <div class="stars">
-        <i class="fas fa-star" onclick="rate(1)"></i>
-        <i class="fas fa-star" onclick="rate(2)"></i>
-        <i class="fas fa-star" onclick="rate(3)"></i>
-        <i class="fas fa-star" onclick="rate(4)"></i>
-        <i class="fas fa-star" onclick="rate(5)"></i>
-      </div>
-      <input type="hidden" id="ratingInput" value="0" />
-      <label>Tell us about your experience</label>
-      <textarea
-        id="feedbackText"
-        placeholder="How did DemandRadar help connect you with a new service in your area?"
-      ></textarea>
-      <label>Your Name</label>
-      <input type="text" id="nameInput" placeholder="Enter your name" />
-      <button type="button" class="submit-btn" onclick="submitFeedback()">
-        <i class="fas fa-paper-plane"></i> Submit Review
-      </button>
-    </form>
-  </div>
-</div>
-
+{% block scripts %}
 <script>
-  let currentRating = 0;
-
-  function rate(stars) {
-    currentRating = stars;
-    document.getElementById("ratingInput").value = stars;
-    const starEls = document.querySelectorAll(".stars i");
-    starEls.forEach((star, index) => {
-      if (index < stars) {
-        star.classList.add("active");
-      } else {
-        star.classList.remove("active");
-      }
-    });
+(function () {
+  const { $, esc, request, drawMap } = DR;
+  const sel = $('#catFilter');
+  async function load() {
+    const { ok, data } = await request('/api/stats?category=' + encodeURIComponent(sel.value));
+    const list = $('#popularList');
+    if (!ok) { list.innerHTML = '<li class="request-item"><span>Could not load data</span></li>'; return; }
+    if (sel.value === 'all') {
+      $('#statTotal').textContent = data.total;
+      $('#statRecent').textContent = data.recent;
+      $('#statCats').textContent = data.categories.length;
+    }
+    list.innerHTML = data.categories.length
+      ? data.categories.map(c => `<li class="request-item"><span>${esc(c.name)}</span><span class="request-count">${c.count}</span></li>`).join('')
+      : '<li class="request-item"><span>No requests yet</span></li>';
+    drawMap($('#homeMap'), data.clusters);
   }
-
-  async function submitFeedback() {
-    const feedback = document.getElementById("feedbackText").value;
-    const name = document.getElementById("nameInput").value;
-
-    if (!feedback || !name || currentRating === 0) {
-      alert("Please fill in all fields and provide a rating");
-      return;
-    }
-
-    const data = {
-      rating: currentRating,
-      feedback: feedback,
-      name: name,
-    };
-
-    try {
-      const response = await fetch("/submit-feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert("Thank you for your feedback!");
-        // Reset form
-        document.getElementById("feedbackText").value = "";
-        document.getElementById("nameInput").value = "";
-        currentRating = 0;
-        document.getElementById("ratingInput").value = 0;
-        document
-          .querySelectorAll(".stars i")
-          .forEach((star) => star.classList.remove("active"));
-        // Hide widget
-        document.querySelector(".feedback-widget").style.display = "none";
-      } else {
-        alert("Error submitting feedback: " + result.message);
-      }
-    } catch (error) {
-      alert("Error submitting feedback. Please try again.");
-      console.error("Error:", error);
-    }
-  }
-</script>
-
-<script>
-  // Scroll animations
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: "0px 0px -50px 0px",
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-      }
-    });
-  }, observerOptions);
-
-  document.querySelectorAll(".animate-on-scroll").forEach((el) => {
-    observer.observe(el);
-  });
-
-  // Navbar scroll effect
-  const navbar = document.querySelector(".navbar");
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 100) {
-      navbar.classList.add("scrolled");
-    } else {
-      navbar.classList.remove("scrolled");
-    }
-  });
-
-  // Interactive card effects
-  document
-    .querySelectorAll(".discover-card, .testimonial-card")
-    .forEach((card) => {
-      card.addEventListener("mouseenter", function (e) {
-        this.style.transform = `perspective(1000px) rotateX(${
-          (e.offsetY - this.offsetHeight / 2) / 20
-        }deg) rotateY(${(e.offsetX - this.offsetWidth / 2) / 20}deg)`;
-      });
-
-      card.addEventListener("mouseleave", function () {
-        this.style.transform = "perspective(1000px) rotateX(0) rotateY(0)";
-      });
-    });
+  sel.addEventListener('change', load);
+  document.addEventListener('DOMContentLoaded', load);
+})();
 </script>
 {% endblock %}

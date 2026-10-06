@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Requests Dashboard{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div class="container">
+    <h1>Demand Requests</h1>
+    <p>Welcome, {{ business }}. Explore community requests and find where your service is needed.</p>
+  </div>
+</section>
+<div class="container" style="padding-top:32px;padding-bottom:72px">
+  <div class="toolbar">
+    <div class="form-group">
+      <label for="cat">Service category</label>
+      <select id="cat"><option value="all">All categories</option>{% for s in service_types %}<option value="{{ s }}">{{ s }}</option>{% endfor %}</select>
+    </div>
+    <a class="btn-ghost" href="{{ url_for('business_logout') }}"><i class="fas fa-right-from-bracket"></i> Sign out</a>
+  </div>
+
+  <div class="biz-layout">
+    <div class="map-wrap"><div class="map" id="bizMap"></div>
+      <div class="map-empty"><div><i class="fas fa-map-location-dot"></i><p>No geo-tagged requests for this category.</p></div></div></div>
+    <div class="panel"><h2>Top categories</h2><p>Requests per service type.</p><div id="bars"></div></div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Service</th><th>Location</th><th>Description</th><th>Date</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="4">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const { $, esc, request, drawMap } = DR;
+  async function load() {
+    const cat = encodeURIComponent($('#cat').value);
+    const [stats, needs] = await Promise.all([request('/api/stats?category=' + cat), request('/api/needs?category=' + cat)]);
+    if (!stats.ok || !needs.ok) {
+      $('#rows').innerHTML = '<tr><td colspan="4">Could not load data. Please refresh.</td></tr>'; return;
+    }
+    drawMap($('#bizMap'), stats.data.clusters);
+    const max = (stats.data.categories[0] || {}).count || 1;
+    $('#bars').innerHTML = stats.data.categories.length ? stats.data.categories.map(c =>
+      `<div class="bar-row"><span>${esc(c.name)}</span><div class="bar"><span style="width:${c.count / max * 100}%"></span></div><b>${c.count}</b></div>`).join('')
+      : '<div class="empty-state">No data yet.</div>';
+    const items = needs.data.items;
+    $('#rows').innerHTML = items.length ? items.map(n =>
+      `<tr><td><span class="tag">${esc(n.service_type)}</span></td><td>${esc(n.location)}</td><td>${esc(n.description) || '<span style="color:var(--muted)">-</span>'}</td><td>${esc(n.submitted_at)}</td></tr>`).join('')
+      : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:32px">No requests found.</td></tr>';
+  }
+  $('#cat').addEventListener('change', load);
+  document.addEventListener('DOMContentLoaded', load);
+})();
+</script>
+{% endblock %}

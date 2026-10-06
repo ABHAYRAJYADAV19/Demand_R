@@ -1,108 +1,72 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DemandRadar - {% block title %}{% endblock %}</title>
+    <title>{% block title %}Home{% endblock %} | DemandRadar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar">
+    {% set ep = request.endpoint %}
+    <header class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <a href="{{ url_for('index') }}">DemandRadar</a>
+                <a href="{{ url_for('index') }}"><span class="logo-mark"><i class="fas fa-location-crosshairs"></i></span><span>Demand<span class="accent">Radar</span></span></a>
             </div>
-            <div class="nav-links">
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('index') }}#insights-dashboard" class="nav-link">Browse Insights</a>
-                <a href="{{ url_for('business_dashboard') }}" class="nav-link">For Businesses</a>
-                <a href="{{ url_for('report_need') }}" class="btn-primary">Report a Need In</a>
-            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><i class="fas fa-bars"></i></button>
+            <nav class="nav-links" aria-label="Main">
+                <a href="{{ url_for('index') }}" class="nav-link {{ 'active' if ep == 'index' }}">Home</a>
+                <a href="{{ url_for('insights') }}" class="nav-link {{ 'active' if ep == 'insights' }}">Browse Insights</a>
+                <a href="{{ url_for('business_dashboard') }}" class="nav-link {{ 'active' if ep in ('business_dashboard', 'business_requests') }}">For Businesses</a>
+                <a href="{{ url_for('report_need') }}" class="btn-primary">Report a Need</a>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    {% block content %}
-    <!-- Update the feedback widget section -->
-    <div class="feedback-widget">
+    <main>{% block content %}{% endblock %}</main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <span>&copy; {{ now_year }} DemandRadar. Connecting community needs with business opportunities.</span>
+            <span>
+                <a href="{{ url_for('report_need') }}">Report a need</a>
+                <a href="{{ url_for('insights') }}">Insights</a>
+                <a href="{{ url_for('business_dashboard') }}">Businesses</a>
+            </span>
+        </div>
+    </footer>
+
+    <button class="fb-launcher" id="feedbackLauncher" aria-expanded="false" aria-controls="feedbackWidget">
+        <i class="fas fa-comment-dots"></i><span>Feedback</span>
+    </button>
+    <aside class="feedback-widget" id="feedbackWidget" aria-label="Share your experience">
         <div class="feedback-header">
             <span>Share Your Experience</span>
-            <button class="close-btn" onclick="document.querySelector('.feedback-widget').style.display='none'">&times;</button>
+            <button type="button" class="close-btn" aria-label="Close feedback">&times;</button>
         </div>
         <div class="feedback-body">
-            <form id="feedbackForm" onsubmit="submitFeedback(event)">
+            <form id="feedbackForm" novalidate>
                 <label>How would you rate your experience?</label>
-                <div class="stars">
-                    <i class="fas fa-star" onclick="rate(1)"></i>
-                    <i class="fas fa-star" onclick="rate(2)"></i>
-                    <i class="fas fa-star" onclick="rate(3)"></i>
-                    <i class="fas fa-star" onclick="rate(4)"></i>
-                    <i class="fas fa-star" onclick="rate(5)"></i>
+                <div class="stars" role="group" aria-label="Rating">
+                    {% for i in range(1, 6) %}<button type="button" aria-label="{{ i }} star{{ 's' if i > 1 }}"><i class="fas fa-star"></i></button>{% endfor %}
                 </div>
-                <input type="hidden" id="rating" name="rating" value="0">
-                <label>Tell us about your experience</label>
-                <textarea name="feedback" required placeholder="How did DemandRadar help connect you with a new service in your area?"></textarea>
-                <label>Your Name</label>
-                <input type="text" name="name" required placeholder="Enter your name" />
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-paper-plane"></i> Submit Review
-                </button>
+                <input type="hidden" id="rating" value="0">
+                <label for="fbText">Tell us about your experience</label>
+                <textarea id="fbText" name="feedback" required maxlength="800" placeholder="How did DemandRadar help you?"></textarea>
+                <label for="fbName">Your name</label>
+                <input type="text" id="fbName" name="name" required maxlength="80" placeholder="Enter your name">
+                <button type="submit" class="btn-primary"><i class="fas fa-spinner fa-spin spinner"></i><i class="fas fa-paper-plane"></i> <span class="btn-label">Submit Review</span></button>
             </form>
         </div>
-    </div>
-    
-    <script>
-    let currentRating = 0;
-    
-    function rate(stars) {
-        currentRating = stars;
-        document.getElementById('rating').value = stars;
-        const starEls = document.querySelectorAll('.stars i');
-        starEls.forEach((star, index) => {
-            if (index < stars) {
-                star.classList.add('active');
-            } else {
-                star.classList.remove('active');
-            }
-        });
-    }
-    
-    async function submitFeedback(event) {
-        event.preventDefault();
-        
-        const formData = new FormData(event.target);
-        const data = {
-            rating: currentRating,
-            feedback: formData.get('feedback'),
-            name: formData.get('name'),
-            date: new Date().toISOString()
-        };
-    
-        try {
-            const response = await fetch('/submit-feedback', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
-    
-            if (response.ok) {
-                alert('Thank you for your feedback!');
-                document.querySelector('.feedback-widget').style.display = 'none';
-                event.target.reset();
-                currentRating = 0;
-                document.querySelectorAll('.stars i').forEach(star => star.classList.remove('active'));
-            } else {
-                alert('Something went wrong. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Something went wrong. Please try again.');
-        }
-    }
-    </script>
-    {% endblock %}
+    </aside>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

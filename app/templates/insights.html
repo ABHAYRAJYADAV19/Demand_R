@@ -1,163 +1,117 @@
 {% extends "base.html" %}
-
 {% block title %}Community Insights{% endblock %}
-
 {% block content %}
-<div class="insights-page">
-    <div class="insights-container">
-        <!-- Refer a Friend Section -->
-        <section class="refer-section">
-            <h2>Help shape your neighborhood – refer a friend!</h2>
-            <p>Know someone who would love our service? Invite them to join our community.</p>
-            
-            <form id="referForm" class="refer-form">
-                <div class="input-group">
-                    <input type="email" id="friendEmail" name="friendEmail" placeholder="Enter friend's email" required>
-                    <button type="submit" class="btn-primary">Refer Now</button>
-                </div>
-            </form>
-            
-            <div class="share-options">
-                <p>Or Share via other apps</p>
-                <div class="share-buttons">
-                    <button id="copyLink" class="btn-share">
-                        <i class="fas fa-link"></i> Copy Link
-                    </button>
-                    <button id="shareWhatsapp" class="btn-share">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </button>
-                    <button id="shareEmail" class="btn-share">
-                        <i class="fas fa-envelope"></i> Email
-                    </button>
-                </div>
-            </div>
-        </section>
+<section class="page-head">
+  <div class="container">
+    <h1>Community Insights</h1>
+    <p>See what your neighbourhood is asking for, and help spread the word.</p>
+  </div>
+</section>
 
-        <!-- Stay Updated Section -->
-        <section class="newsletter-section">
-            <h2>Stay Updated</h2>
-            <p>Subscribe to our newsletter for the latest insights and updates on neighborhood demands.</p>
-            
-            <form id="newsletterForm" class="newsletter-form">
-                <div class="input-group">
-                    <input type="email" id="subscriberEmail" name="subscriberEmail" placeholder="Enter your email" required>
-                    <button type="submit" class="btn-primary">Notify Me</button>
-                </div>
-            </form>
-        </section>
-
-        <!-- Community Stats Section -->
-        <section class="stats-section">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-store"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>{{ most_requested.count }} people requested {{ most_requested.service }}</h3>
-                    <p>{% if most_requested.description %}Details: {{ most_requested.description }}{% else %}Join your neighbors in shaping community services{% endif %}</p>
-                </div>
-            </div>
-            
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>{{ recent_submissions }}</h3>
-                        <p>Submitted in past 24hrs</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>{{ total_submissions }}</h3>
-                        <p>Total Submissions</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="popular-services">
-                <div class="service-list">
-                    {% for service in service_types %}
-                    <div class="service-item">
-                        <span class="service-name">{{ service._id }}</span>
-                        <span class="service-count">{{ service.count }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </section>
+<div class="container" style="padding-top:32px;padding-bottom:72px;display:grid;gap:24px">
+  <section class="stat-grid" aria-label="Community stats">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-fire"></i></div>
+      <div class="stat-info">
+        <h3>{{ top.name if top else 'No requests yet' }}</h3>
+        <p>Most requested service{% if top %} ({{ top.count }} request{{ 's' if top.count != 1 }}){% endif %}</p>
+      </div>
     </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-clock"></i></div>
+      <div class="stat-info"><h3>{{ stats.recent }}</h3><p>Submitted in past 24 hrs</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-users"></i></div>
+      <div class="stat-info"><h3>{{ stats.total }}</h3><p>Total submissions</p></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Requests by service</h2>
+    <p>How community demand is distributed across categories.</p>
+    {% if stats.categories %}
+      {% set maxc = stats.categories[0].count %}
+      {% for c in stats.categories %}
+      <div class="bar-row">
+        <span>{{ c.name }}</span>
+        <div class="bar" role="img" aria-label="{{ c.count }} requests"><span style="width: {{ (c.count / maxc * 100)|round|int }}%"></span></div>
+        <b>{{ c.count }}</b>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state"><i class="fas fa-inbox"></i>No reports yet. <a href="{{ url_for('report_need') }}">Be the first to report a need.</a></div>
+    {% endif %}
+  </section>
+
+  <div class="two-col">
+    <section class="panel">
+      <h2>Help shape your neighbourhood: refer a friend</h2>
+      <p>Know someone who would love DemandRadar? Invite them to join.</p>
+      <form id="referForm" novalidate>
+        <div class="input-group">
+          <input type="email" id="friendEmail" aria-label="Friend's email" placeholder="Enter friend's email" required>
+          <button type="submit" class="btn-primary"><i class="fas fa-spinner fa-spin spinner"></i><span class="btn-label">Refer now</span></button>
+        </div>
+      </form>
+      <p style="margin:18px 0 0">Or share via other apps</p>
+      <div class="share-buttons">
+        <button type="button" id="copyLink" class="btn-ghost"><i class="fas fa-link"></i> Copy link</button>
+        <button type="button" id="shareWhatsapp" class="btn-ghost"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+        <button type="button" id="shareEmail" class="btn-ghost"><i class="fas fa-envelope"></i> Email</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Stay updated</h2>
+      <p>Subscribe for the latest insights and updates on neighbourhood demand.</p>
+      <form id="newsletterForm" novalidate>
+        <div class="input-group">
+          <input type="email" id="subscriberEmail" aria-label="Your email" placeholder="Enter your email" required>
+          <button type="submit" class="btn-primary"><i class="fas fa-spinner fa-spin spinner"></i><span class="btn-label">Notify me</span></button>
+        </div>
+      </form>
+    </section>
+  </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Refer Form Handler
-    const referForm = document.getElementById('referForm');
-    referForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('friendEmail').value;
-        
-        try {
-            const response = await fetch('/send-referral', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email })
-            });
-            
-            const data = await response.json();
-            if (data.success) {
-                alert('Referral sent successfully!');
-                referForm.reset();
-            }
-        } catch (error) {
-            alert('Error sending referral');
-        }
-    });
+(function () {
+  const { $, toast, postJSON, setLoading } = DR;
+  const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-    // Newsletter Form Handler
-    const newsletterForm = document.getElementById('newsletterForm');
-    newsletterForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('subscriberEmail').value;
-        
-        try {
-            const response = await fetch('/subscribe-newsletter', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email })
-            });
-            
-            const data = await response.json();
-            if (data.success) {
-                alert('Subscription successful!');
-                newsletterForm.reset();
-            }
-        } catch (error) {
-            alert('Error subscribing to newsletter');
-        }
+  function wire(formSel, inputSel, url) {
+    const form = $(formSel), input = $(inputSel), btn = $('button[type=submit]', form);
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      input.classList.remove('is-invalid');
+      if (!EMAIL.test(input.value.trim())) {
+        input.classList.add('is-invalid'); input.focus();
+        return toast('Please enter a valid email address.', 'error');
+      }
+      setLoading(btn, true);
+      const { ok, data } = await postJSON(url, { email: input.value.trim() });
+      setLoading(btn, false);
+      toast(data.message || (ok ? 'Done!' : 'Something went wrong.'), ok ? 'success' : 'error');
+      if (ok) form.reset();
     });
+  }
+  wire('#referForm', '#friendEmail', '/send-referral');
+  wire('#newsletterForm', '#subscriberEmail', '/subscribe-newsletter');
 
-    // Share Functionality
-    document.getElementById('copyLink').addEventListener('click', () => {
-        navigator.clipboard.writeText(window.location.origin)
-            .then(() => alert('Link copied to clipboard!'));
-    });
-
-    document.getElementById('shareWhatsapp').addEventListener('click', () => {
-        window.open(`https://wa.me/?text=${encodeURIComponent('Check out DemandRadar: ' + window.location.origin)}`);
-    });
-
-    document.getElementById('shareEmail').addEventListener('click', () => {
-        window.location.href = `mailto:?subject=Check out DemandRadar&body=I thought you might be interested in this: ${window.location.origin}`;
-    });
-});
+  const origin = location.origin;
+  $('#copyLink').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(origin); toast('Link copied to clipboard!'); }
+    catch (_) { toast('Could not copy. Please copy ' + origin + ' manually.', 'error'); }
+  });
+  $('#shareWhatsapp').addEventListener('click', () =>
+    window.open('https://wa.me/?text=' + encodeURIComponent('Check out DemandRadar: ' + origin), '_blank', 'noopener'));
+  $('#shareEmail').addEventListener('click', () => {
+    location.href = 'mailto:?subject=' + encodeURIComponent('Check out DemandRadar') +
+      '&body=' + encodeURIComponent('I thought you might be interested in this: ' + origin);
+  });
+})();
 </script>
 {% endblock %}
